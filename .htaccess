@@ -1,0 +1,13 @@
+php_flag magic_qoutes Off
+
+AddDefaultCharset utf-8 
+
+DirectoryIndex index.php 
+
+RewriteEngine On
+ 
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !favicon.ico
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule ^(.*)$ index.php 
