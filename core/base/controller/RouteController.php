@@ -10,6 +10,14 @@ class RouteController
 
 static private $_instance;
 
+protected $routes;
+
+protected $controller;
+protected $inputMethod;
+protected $outputMethod;
+protected $parametrs;
+
+
 private function __clone()
 {
     
@@ -27,8 +35,12 @@ static public function getInstance() {
 private function __construct()
 {
     
-    $s = Settings::get('routes');
-    $s1 = ShopSettings::get('routes');
+   $adress_str = $_SERVER['REQUEST_URI'];
+   if(strrpos($adress_str, '/') === strlen($adress_str) - 1 && strrpos($adress_str, '/') !== 0) {
+       // $this->redirect(rtrim($adress_str, '/'), 301);
+   }
+
+   $path = substr($_SERVER['PHP_SELF'], 0, strpos($_SERVER['PHP_SELF'], 'index.php')); // watch
 
     exit();
 }

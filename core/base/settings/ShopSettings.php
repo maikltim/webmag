@@ -12,6 +12,15 @@ class ShopSettings
     static private $_instance;
     private $baseSettings;
 
+    private $routes = [
+        'admin' => [
+            'name' => 'sudo',
+        ],
+        'vasya' => [
+            'name' => 'vasya'
+        ]
+    ];
+
 
     private $templateArr = [
         'text' => ['name', 'phone'],
