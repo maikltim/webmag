@@ -28,8 +28,9 @@ private function __construct()
 {
     
     $s = Settings::get('routes');
-    $s1 = ShopSettings::get('property');
+    $s1 = ShopSettings::get('routes');
 
+    exit();
 }
 
 }
