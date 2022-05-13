@@ -2,6 +2,7 @@
 
 namespace core\base\controller;
 
+use core\base\exception\RouteException;
 use core\base\settings\Settings;
 use core\base\settings\ShopSettings;
 
@@ -40,9 +41,49 @@ private function __construct()
        // $this->redirect(rtrim($adress_str, '/'), 301);
    }
 
-   $path = substr($_SERVER['PHP_SELF'], 0, strpos($_SERVER['PHP_SELF'], 'index.php')); // watch
+   $path = substr($_SERVER['PHP_SELF'], 0, strpos($_SERVER['PHP_SELF'], 'index.php')); // watch 
+
+   if($path === PATH) {
+    $this->routes = Settings::get('routes');
+
+    if(!$this->routes) throw new RouteException('Сайт находится на техническом обслуживании'); 
+
+    if(strrpos($adress_str, $this->routes['admin']['alias']) === strlen(PATH)) {
+        // admin
+
+
+    } else {
+        $irl = explode('/', substr($adress_str, strlen(PATH)));
+        $hrUrl = $this->routes['user']['hrUrl'];
+
+        $this->controller = $this->routes['user']['path'];
+
+        $route = 'user';
+    }
+
+    $this->createRoute($route, $url);
 
     exit();
+   } else {
+       try {
+           throw new \Exception('Не корректная директория сайта');
+       } 
+       catch(\Exception $e) {
+           exit($e->getMessage());
+       }
+   }
+
+}
+
+private function createRoute($var, $arr) {
+    $route = [];
+
+    if(!empty($arr[0])) {
+        if($this->routes[$var]['routes'][$arr[0]]) {
+            $route = explode('/', $this->routes[$var]['routes'][$arr[0]]);
+            
+        }
+    }
 }
 
 }
