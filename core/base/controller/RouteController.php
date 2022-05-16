@@ -38,7 +38,7 @@ private function __construct()
     
    $adress_str = $_SERVER['REQUEST_URI'];
    if(strrpos($adress_str, '/') === strlen($adress_str) - 1 && strrpos($adress_str, '/') !== 0) {
-       // $this->redirect(rtrim($adress_str, '/'), 301);
+        $this->redirect(rtrim($adress_str, '/'), 301);
    }
 
    $path = substr($_SERVER['PHP_SELF'], 0, strpos($_SERVER['PHP_SELF'], 'index.php')); // watch 
@@ -48,12 +48,39 @@ private function __construct()
 
     if(!$this->routes) throw new RouteException('Сайт находится на техническом обслуживании'); 
 
-    if(strrpos($adress_str, $this->routes['admin']['alias']) === strlen(PATH)) {
-        // admin
+    if(strpos($adress_str, $this->routes['admin']['alias']) === strlen(PATH)) {
+        $url = explode('/', substr($adress_str, strlen(PATH . $this->routes['admin']['alias']) + 1));
 
+        if($url[0] && is_dir($_SERVER['DOCUMENT_ROOT'] . PATH . $this->routes['plugins']['path'] . $url[0])) {
+
+            $plugin = array_shift($url);
+
+            $pluginSettings = $this->routes['settings']['path'] . ucfirst($plugin . 'Settings');
+
+            if(file_exists($_SERVER['DOCUMENT_ROOT'] . PATH . $pluginSettings . 'php')) {
+                $pluginSettings = str_replace('/', '\\', $pluginSettings);
+                $this->routes = $pluginSettings::get('routes');
+            }
+
+            $dir = $this->routes['plugins']['dir'] ? '/' . $this->routes['plugins']['dir'] . '/' :  '/';
+            $dir = str_replace('//', '/', $dir);
+
+            $this->controller = $this->routes['plugins']['path'] . $plugin . $dir;
+            $hrUrl = $this->routes['plugins']['hrUrl'];
+
+            $route = 'plugins';
+
+        } else {
+            $this->controller = $this->routes['admin']['path']; 
+
+            $hrUrl = $this->routes['admin']['hrUrl'];
+
+            $route = 'admin';
+        }
 
     } else {
-        $irl = explode('/', substr($adress_str, strlen(PATH)));
+
+        $url = explode('/', substr($adress_str, strlen(PATH)));
         $hrUrl = $this->routes['user']['hrUrl'];
 
         $this->controller = $this->routes['user']['path'];
