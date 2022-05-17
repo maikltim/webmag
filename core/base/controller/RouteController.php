@@ -6,17 +6,14 @@ use core\base\exception\RouteException;
 use core\base\settings\Settings;
 use core\base\settings\ShopSettings;
 
-class RouteController 
+class RouteController extends BaseController
 {
 
 static private $_instance;
 
 protected $routes;
 
-protected $controller;
-protected $inputMethod;
-protected $outputMethod;
-protected $parametrs;
+
 
 
 private function __clone()
@@ -41,31 +38,33 @@ private function __construct()
         $this->redirect(rtrim($adress_str, '/'), 301);
    }
 
-   $path = substr($_SERVER['PHP_SELF'], 0, strpos($_SERVER['PHP_SELF'], 'index.php')); // watch 
-
+   $path = substr($_SERVER['PHP_SELF'], 19, strpos($_SERVER['PHP_SELF'], 'index.php')); // watch 
+   
    if($path === PATH) {
     $this->routes = Settings::get('routes');
 
     if(!$this->routes) throw new RouteException('Сайт находится на техническом обслуживании'); 
-
-    if(strpos($adress_str, $this->routes['admin']['alias']) === strlen(PATH)) {
-        $url = explode('/', substr($adress_str, strlen(PATH . $this->routes['admin']['alias']) + 1));
+    $url = explode('/', substr($adress_str, strlen(PATH)));
+    
+    
+    if($url[0] && $url[0] === $this->routes['admin']['alias']) {
+       
+        array_shift($url);
 
         if($url[0] && is_dir($_SERVER['DOCUMENT_ROOT'] . PATH . $this->routes['plugins']['path'] . $url[0])) {
 
             $plugin = array_shift($url);
-
             $pluginSettings = $this->routes['settings']['path'] . ucfirst($plugin . 'Settings');
 
             if(file_exists($_SERVER['DOCUMENT_ROOT'] . PATH . $pluginSettings . 'php')) {
                 $pluginSettings = str_replace('/', '\\', $pluginSettings);
                 $this->routes = $pluginSettings::get('routes');
             }
-
             $dir = $this->routes['plugins']['dir'] ? '/' . $this->routes['plugins']['dir'] . '/' :  '/';
             $dir = str_replace('//', '/', $dir);
 
             $this->controller = $this->routes['plugins']['path'] . $plugin . $dir;
+
             $hrUrl = $this->routes['plugins']['hrUrl'];
 
             $route = 'plugins';
@@ -80,7 +79,7 @@ private function __construct()
 
     } else {
 
-        $url = explode('/', substr($adress_str, strlen(PATH)));
+       
         $hrUrl = $this->routes['user']['hrUrl'];
 
         $this->controller = $this->routes['user']['path'];
@@ -89,9 +88,31 @@ private function __construct()
     }
 
     $this->createRoute($route, $url);
+    if($url[1]) {
+        $count = count($url);
+        $key = '';
+
+
+        if(!$hrUrl) {
+            $i = 1;
+        } else {
+            $this->parametrs['alias'] = $url[1];
+            $i = 2;
+        }
+
+        for(; $i < $count; $i++) {
+            if(!$key) {
+                $key = $url[$i];
+                $this->parametrs[$key] = '';
+            } else {
+                $this->parametrs[$key] = $url[$i];
+                $key = '';
+            }
+        }
+    }
 
     exit();
-   } else {
+    } else {
        try {
            throw new \Exception('Не корректная директория сайта');
        } 
