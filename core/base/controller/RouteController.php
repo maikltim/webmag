@@ -96,16 +96,16 @@ private function __construct()
         if(!$hrUrl) {
             $i = 1;
         } else {
-            $this->parametrs['alias'] = $url[1];
+            $this->parameters['alias'] = $url[1];
             $i = 2;
         }
 
         for(; $i < $count; $i++) {
             if(!$key) {
                 $key = $url[$i];
-                $this->parametrs[$key] = '';
+                $this->parameters[$key] = '';
             } else {
-                $this->parametrs[$key] = $url[$i];
+                $this->parameters[$key] = $url[$i];
                 $key = '';
             }
         }

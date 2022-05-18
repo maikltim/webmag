@@ -1,0 +1,1 @@
+<h1 style="color: red"><$=$this->name></h1>
