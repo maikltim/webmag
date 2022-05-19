@@ -11,17 +11,10 @@ class IndexController extends BaseController {
 
     protected function inputData() 
     {
-
-        $this->name = 'Masha';
-
+       
+        exit();
     }
 
-    protected function outputData() 
-    {
-
-        $vars = func_get_arg(0);
-        exit($this->render('', $vars));
-
-    }
+    
 
 }

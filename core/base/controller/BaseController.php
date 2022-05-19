@@ -3,9 +3,13 @@
 namespace core\base\controller;
 
 use core\base\exception\RouteException;
+use core\base\settings\Settings;
 
 abstract class BaseController
 {
+
+
+    use \core\base\controller\BaseMethods;
 
     protected $page;
     protected $errors;
@@ -47,11 +51,16 @@ abstract class BaseController
 
         $data = $this->$inputData();
 
-        if(method_exists($this, $outputData)) $this->page = $this->$outputData($data);
-        elseif($data) $this->page = $data;
+        if(method_exists($this, $outputData))  {
+            $page = $this->$outputData($data);
+            if($page) $this->page = $page;
+            
+        } elseif($data) {
+            $this->page = $data;
+        }
 
         if($this->errors) {
-            $this->writeLog();
+            $this->writeLog($this->errors);
         }
         $this->getPage();
     }
@@ -61,7 +70,16 @@ abstract class BaseController
         extract($parameters);
 
         if(!$path) {
-            $path = TEMPLATE . explode('controller', strtolower((new \ReflectionClass($this))->getShortName()))[0];
+
+            $class = new \ReflectionClass($this);
+
+            $space = str_replace('\\', '/',  $class->getNamespaceName() . '\\');
+            $routes = Settings::get('routes');
+
+            if($space === $routes['user']['path']) $template = TEMPLATE;
+                elseif($path === $routes['admin']['path']) $template = ADMIN_TEMPLATE;
+
+            $path = $template . explode('controller', strtolower($class->getShortName()))[0];
         }
 
         ob_start();
