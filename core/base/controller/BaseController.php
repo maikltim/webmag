@@ -2,7 +2,7 @@
 
 namespace core\base\controller;
 
-use core\base\exception\RouteException;
+use core\base\exceptions\RouteException;
 use core\base\settings\Settings;
 
 abstract class BaseController
@@ -18,6 +18,9 @@ abstract class BaseController
     protected $inputMethod;
     protected $outputMethod;
     protected $parametrs;
+
+    protected $styles;
+    protected $scripts;
 
 
     public function route() {
@@ -98,8 +101,7 @@ abstract class BaseController
         }
     }
 
-    protected $styles;
-    protected $scripts;
+    
 
     protected function init($admin = false) {
 

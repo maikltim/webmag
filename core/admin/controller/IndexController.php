@@ -3,6 +3,7 @@
 namespace core\user\controller;
 
 use core\base\controller\BaseController;
+use core\admin\model\Model;
 
 class IndexController extends BaseController {
 
@@ -11,8 +12,10 @@ class IndexController extends BaseController {
 
     protected function inputData() 
     {
+
+        $db = Model::instance();
        
-        exit();
+        exit(' I am admin');
     }
 
     

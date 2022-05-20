@@ -25,7 +25,7 @@ const USER_CSS_JS = [
     'scripts' => []
 ];
 
-use core\base\exception\RouteException;
+use core\base\exceptions\RouteException;
 
 
 
