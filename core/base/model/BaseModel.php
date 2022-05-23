@@ -177,7 +177,7 @@ class BaseModel
                           }
                     }
 
-                    $where .= $table . $key . ' ' . $operand . ' (' . trim($in_str) . ') ' . $condition; 
+                    $where .= $table . $key . ' ' . $operand . ' (' . trim($in_str, ',') . ') ' . $condition; 
                 }
             }
 
