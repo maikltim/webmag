@@ -24,7 +24,7 @@ private function __construct()
         $this->redirect(rtrim($adress_str, '/'), 301);
    }
 
-   $path = substr($_SERVER['PHP_SELF'], 19, strpos($_SERVER['PHP_SELF'], 'index.php')); // watch 
+   $path = substr($_SERVER['PHP_SELF'], 0, strpos($_SERVER['PHP_SELF'], 'index.php')); // watch 
    
    if($path === PATH) {
     $this->routes = Settings::get('routes');
