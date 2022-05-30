@@ -7,7 +7,7 @@ namespace core\base\model;
 use core\base\controller\Singleton;
 use core\base\exceptions\DbException;
 
-class BaseModel 
+class BaseModel extends BaseModelMethod
 {
 
     use Singleton;
