@@ -4,6 +4,7 @@ namespace core\user\controller;
 
 use core\base\controller\BaseController;
 use core\admin\model\Model;
+use core\base\settings\Settings;
 
 class IndexController extends BaseController {
 
@@ -13,19 +14,9 @@ class IndexController extends BaseController {
     protected function inputData() 
     {
 
-        $db = Model::instance();
+        $redirect = PATH. Settings::get('routes')['admin']['alias'] . '/show';
+        $this->redirect($redirect);
 
-        $table = 'teachers';
-
-        $color = ['red', 'blue', 'black'];
-
-        $res = $db->get($table, [
-           'fields' => ['id', 'name'],
-           'where' => ['name' => "Hello"],
-           'limit' => '1'
-         ])[0];
-       
-        exit('id=' . $res['id'] . ' Name = ' . $res['name']);
     }
 
     
