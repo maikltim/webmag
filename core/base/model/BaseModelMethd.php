@@ -145,6 +145,7 @@ abstract class BaseModelMethod
         $fields = '';
         $join = '';
         $where = '';
+        $tables = '';
 
         if($set['join']) {
             $join_table = $table;
@@ -187,6 +188,7 @@ abstract class BaseModelMethod
                         $join .= '.' . $join_fields[0] . '=' . $key . '.' .$join_fields[1];
 
                         $join_table = $key;
+                        $tables .= ', ' . trim($join_table);
 
                         if($new_where) {
                             if($item['where']) {
@@ -204,7 +206,7 @@ abstract class BaseModelMethod
             }
         }
 
-        return compact('fields', 'join', 'where');
+        return compact('fields', 'join', 'where', 'tables');
 
     }
 
@@ -259,8 +261,12 @@ abstract class BaseModelMethod
 
                 if(in_array($value, $this->sqlFunc)) {
                     $update .= $value . ',';
+                } elseif ($value === NULL) {
+
+                    $update .= "NULL" . ',';
+
                 } else {
-                    $update .= "'" . addslashes($value) . "',";
+                    $update .= "" . addslashes($value) . "',";
                 }
             }
         }
@@ -278,5 +284,7 @@ abstract class BaseModelMethod
         return rtrim($update, ',');
 
     }
+
+
 
 }
