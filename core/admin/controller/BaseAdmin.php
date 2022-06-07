@@ -15,6 +15,7 @@ abstract class BaseAdmin extends BaseController
 
     protected $table;
     protected $columns;
+    protected $data;
 
 
     protected $menu;
@@ -59,6 +60,39 @@ abstract class BaseAdmin extends BaseController
         $this->columns = $this->model->showColumns($this->table);
 
         if(!$this->columns) new RouteException('Не найдены поля в таблице - ' . $this->table, 2);
+
+    }
+
+
+    protected function createData($arr =[], $add = true) {
+
+        $fields = [];
+        $order = [];
+        $order_direction = [];
+
+        if($add) {
+
+            if($this->columns['id_row']) return $this->data = [];
+
+            $fields[] = $this->columns['id_row'] . ' as id';
+            if($this->columns['name']) $fields['name'] = 'name';
+            if($this->columns['img']) $fields['img'] = 'img';
+
+            if(count($fields) < 3) {
+                foreach($this->columns as $key => $item) {
+                    if(!$fields['name'] && strpos($key, 'name') !== false) {
+                        $fields['name'] = $key . ' as name';
+                    }
+                    if(!$fields['name'] && strpos($key, 'img') === 0) {
+                        $fields['name'] = $key . ' as name';
+                    }
+                }
+            }
+
+        } else {
+
+
+        }
 
     }
 
