@@ -89,8 +89,15 @@ abstract class BaseAdmin extends BaseController
                 }
             }
 
+            if($arr) {
+
+                $fields = Settings::instance()->arrayMergeRecursive($fields, $arr);
+
+            }
+
         } else {
 
+            if(!$arr) return $this->data = [];
 
         }
 
