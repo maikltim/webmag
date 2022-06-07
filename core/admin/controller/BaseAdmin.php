@@ -89,16 +89,80 @@ abstract class BaseAdmin extends BaseController
                 }
             }
 
-            if($arr) {
-
-                $fields = Settings::instance()->arrayMergeRecursive($fields, $arr);
+            if($arr['fields']) {
+                if(is_array($arr['fields'])) {
+                    $fields = Settings::instance()->arrayMergeRecursive($fields, $arr['fields']);
+                } else {
+                    $fields[] = $arr['fields'];
+                }
+               
 
             }
+
+            if($this->columns['parent_id']) {
+                if(!in_array('parent_id', $fields)) $fields[] = 'parent_id';
+                $order[] = 'parent_id';
+            }
+
+            if($this->columns['menu_position']) $order[] = 'menu_position';
+                elseif($this->columns['date']) {
+                    if($order) $order_direction = ['ASC', 'DESC'];
+                        else $order_direction[] = ['DESC'];
+
+                        $oreder[] = 'date';
+                }
+                if($arr['order']) {
+
+                    if(is_array($arr['order'])) {
+                        $order = Settings::instance()->arrayMergeRecursive($order, $arr['order']);
+                    } else {
+                        $order[] = $arr['order'];
+                    }
+    
+                }
+
+                if($arr['order_direction']) {
+
+                    if(is_array(['order_direction'])) {
+                        $order_direction = Settings::instance()->arrayMergeRecursive($order_direction, $arr['order_direction']);
+                    } else {
+                        $order_direction[] = $arr['order_direction'];
+                    }
+    
+                }
 
         } else {
 
             if(!$arr) return $this->data = [];
 
+            $fields = $arr['fields'];
+            $order = $arr['order'];
+            $order_direction = ['order_direction'];
+
+        }
+
+        $this->data = $this->model->get($this->table, [
+            'fields' => $fields,
+            'order' => $order,
+            'order_direction' => $order_direction
+        ]);
+
+    }
+
+
+    protected function expansion($args = []) {
+
+        $filename = explode('_', $this->table);
+        $className = '';
+
+        foreach($filename as $item) $className .= ucfirst($item);
+
+        $class = Settings::get('expansion') . $className . 'Expansion';
+
+        if(is_readable($_SERVER['DOCUMENT_ROOT'] . PATH. $class . 'php' )) {
+            $class = str_replace('/', '\\', $class);
+
+            $exp = $class::instance();
         }
 
     }
