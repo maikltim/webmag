@@ -4,13 +4,13 @@
 namespace core\base\model;
 
 
-use core\base\controller\Singleton;
+
 use core\base\exceptions\DbException;
 
-class BaseModel extends BaseModelMethod
+abstract class BaseModel extends BaseModelMethod
 {
 
-    use Singleton;
+   
 
     protected $db;
 

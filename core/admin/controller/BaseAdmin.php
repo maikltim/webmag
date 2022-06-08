@@ -64,105 +64,45 @@ abstract class BaseAdmin extends BaseController
     }
 
 
-    protected function createData($arr =[], $add = true) {
-
-        $fields = [];
-        $order = [];
-        $order_direction = [];
-
-        if($add) {
-
-            if($this->columns['id_row']) return $this->data = [];
-
-            $fields[] = $this->columns['id_row'] . ' as id';
-            if($this->columns['name']) $fields['name'] = 'name';
-            if($this->columns['img']) $fields['img'] = 'img';
-
-            if(count($fields) < 3) {
-                foreach($this->columns as $key => $item) {
-                    if(!$fields['name'] && strpos($key, 'name') !== false) {
-                        $fields['name'] = $key . ' as name';
-                    }
-                    if(!$fields['name'] && strpos($key, 'img') === 0) {
-                        $fields['name'] = $key . ' as name';
-                    }
-                }
-            }
-
-            if($arr['fields']) {
-                if(is_array($arr['fields'])) {
-                    $fields = Settings::instance()->arrayMergeRecursive($fields, $arr['fields']);
-                } else {
-                    $fields[] = $arr['fields'];
-                }
-               
-
-            }
-
-            if($this->columns['parent_id']) {
-                if(!in_array('parent_id', $fields)) $fields[] = 'parent_id';
-                $order[] = 'parent_id';
-            }
-
-            if($this->columns['menu_position']) $order[] = 'menu_position';
-                elseif($this->columns['date']) {
-                    if($order) $order_direction = ['ASC', 'DESC'];
-                        else $order_direction[] = ['DESC'];
-
-                        $oreder[] = 'date';
-                }
-                if($arr['order']) {
-
-                    if(is_array($arr['order'])) {
-                        $order = Settings::instance()->arrayMergeRecursive($order, $arr['order']);
-                    } else {
-                        $order[] = $arr['order'];
-                    }
     
-                }
-
-                if($arr['order_direction']) {
-
-                    if(is_array(['order_direction'])) {
-                        $order_direction = Settings::instance()->arrayMergeRecursive($order_direction, $arr['order_direction']);
-                    } else {
-                        $order_direction[] = $arr['order_direction'];
-                    }
-    
-                }
-
-        } else {
-
-            if(!$arr) return $this->data = [];
-
-            $fields = $arr['fields'];
-            $order = $arr['order'];
-            $order_direction = ['order_direction'];
-
-        }
-
-        $this->data = $this->model->get($this->table, [
-            'fields' => $fields,
-            'order' => $order,
-            'order_direction' => $order_direction
-        ]);
-
-    }
 
 
-    protected function expansion($args = []) {
+    protected function expansion($args = [], $settings=false) {
 
         $filename = explode('_', $this->table);
         $className = '';
 
         foreach($filename as $item) $className .= ucfirst($item);
 
-        $class = Settings::get('expansion') . $className . 'Expansion';
+        if(!$settings) {
+            $path = Settings::get('expansion');
+        } elseif(is_object($settings)) {
+            $path = Settings::get('expansion');
+        } else {
+            $path = $settings;
+        }
+
+        $class = $path . $className . 'Expansion';
 
         if(is_readable($_SERVER['DOCUMENT_ROOT'] . PATH. $class . 'php' )) {
             $class = str_replace('/', '\\', $class);
 
             $exp = $class::instance();
+
+            $res = $exp->expansion($args);
+
+            foreach($this as $name => $value) {
+                $exp->$name = $name;
+            }
+            return  $exp->expansion($args);
+        } else {
+            $file = $_SERVER['DOCUMENT_ROOT'] . PATH . $path . $this->table . '.php';
+
+            extract($args);
+
+            if(is_readable($file)) return include $file;
+
+            return false;
         }
 
     }
