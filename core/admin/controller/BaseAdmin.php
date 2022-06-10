@@ -17,6 +17,8 @@ abstract class BaseAdmin extends BaseController
     protected $columns;
     protected $data;
 
+    protected $adminPath;
+
 
     protected $menu;
     protected $title;
@@ -29,6 +31,7 @@ abstract class BaseAdmin extends BaseController
 
         if(!$this->model) $this->model = Model::instance();
         if(!$this->menu) $this->menu = Settings::get('projectTables');
+        if(!$this->adminPath) $this->adminPath = Settings::get('routes')['admin']['alias'] . '/';
 
         $this->sendNoCasheHeaders();
 
