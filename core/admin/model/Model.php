@@ -10,6 +10,6 @@ class Model extends BaseModel
 {
 
 
-    use Singleton
+    use Singleton;
 
 }
