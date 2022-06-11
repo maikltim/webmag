@@ -41,13 +41,29 @@ class Settings
             ]
     ];
 
+    private $expansion = 'core/admin/expansion/';
+
+
+    private $projectTables = [
+        'teachers' => ['name' => 'Teachers', 'img' => 'pages.png'],
+        'students' => ['name' => 'Students']
+    ];
+
+
     private $templateArr = [
         'text' => ['name', 'phone', 'address'],
         'textarea' => ['content', 'keywords']
     ];
 
+    private $transleta = [
+        'name' => []
+    ];
 
-    private $expansion = 'core/admin/expansion/';
+    private $blockNeedle = [
+        'vg-rows' => [],
+        'vg_img' => [],
+        'vg-content' => []
+    ];
     
 
     static public function get($property)

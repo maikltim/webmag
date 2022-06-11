@@ -23,6 +23,9 @@ abstract class BaseAdmin extends BaseController
     protected $menu;
     protected $title;
 
+    protected $translete;
+    protected $blocks;
+
 
     protected function inputData() {
 
@@ -31,13 +34,24 @@ abstract class BaseAdmin extends BaseController
 
         if(!$this->model) $this->model = Model::instance();
         if(!$this->menu) $this->menu = Settings::get('projectTables');
-        if(!$this->adminPath) $this->adminPath = Settings::get('routes')['admin']['alias'] . '/';
+        if(!$this->adminPath) $this->adminPath = PATH . Settings::get('routes')['admin']['alias'] . '/';
 
         $this->sendNoCasheHeaders();
 
     }
 
     protected function outputData() {
+
+
+        if(!$this->content) {
+            $args = func_get_arg(0);
+        $vars = $args ? $args : [];
+
+        //if(!$this->tamplate) $this->tamplate = ADMIN_TEMPLATE . 'show';
+
+        $this->content = $this->render($this->tamplate, $vars);
+
+        }
 
         $this->header = $this->render(ADMIN_TEMPLATE . 'include/header'); 
         $this->footer = $this->render(ADMIN_TEMPLATE . 'include/footer');
@@ -58,11 +72,15 @@ abstract class BaseAdmin extends BaseController
         self::inputData();
     }
 
-    protected function createTableData() {
+    protected function createTableData($settings = false) {
 
         if(!$this->table) {
             if($this->parametrs) $this->table = array_keys($this->parametrs)[0];
-                else$this->table = Settings::get('defaultTable');
+                else {
+
+                    if(!$settings) $settings = Settings::instance();
+                    $this->table = $settings::get('defaultTable');
+                }
         }
 
         $this->columns = $this->model->showColumns($this->table);
@@ -110,8 +128,53 @@ abstract class BaseAdmin extends BaseController
 
             if(is_readable($file)) return include $file;
 
-            return false;
         }
+
+        return false;
+
+    }
+
+    protected function createOutputData($settings = false) {
+
+        if(!$settings) $settings = Settings::instance();
+
+        $blocks = $settings::get('blockNeedle');
+        $this->translete = $settings::get('translete');
+
+        if(!$blocks || !is_array($blocks)) {
+
+            foreach($this->columns as $name => $item) {
+                if($name === 'id_row') continue;
+
+                if(!$this->translete[$name]) $this->translete[$name][] = $name;
+                $this->blocks[0][] = $name;
+            }
+
+            return;
+        }
+
+        $default = array_keys($blocks)[0];
+
+        foreach($this->columns as $name => $item) {
+            if($name === 'id_row') continue;
+
+            $insert = false;
+
+            foreach($blocks as $block => $value) {
+                if(!array_key_exists($block, $this->blocks)) $this->blocks[$block] = [];
+
+                if(in_array($name, $value)) {
+                    $this->blocks[$block][] = $name;
+                    $insert = true;
+                    break;
+                }
+            }
+
+            if(!$insert) $this->blocks[$default][] = $name;
+            if(!$this->translete[$name]) $this->translete[$name][] = $name;
+        }
+
+        return;
 
     }
 
