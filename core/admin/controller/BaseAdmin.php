@@ -39,6 +39,11 @@ abstract class BaseAdmin extends BaseController
 
     protected function outputData() {
 
+        $this->header = $this->render(ADMIN_TEMPLATE . 'include/header'); 
+        $this->footer = $this->render(ADMIN_TEMPLATE . 'include/footer');
+        
+        return $this->render(ADMIN_TEMPLATE . 'layout/default');
+
     }
 
 

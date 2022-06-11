@@ -25,6 +25,8 @@ abstract class BaseController
     protected $outputMethod;
     protected $parametrs;
 
+
+    protected $template;
     protected $styles;
     protected $scripts;
 

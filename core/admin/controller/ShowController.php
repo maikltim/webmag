@@ -21,6 +21,12 @@ class ShowController extends BaseAdmin
 
         $args = func_get_arg(0);
         $vars = $args ? $args : [];
+
+        if(!$this->tamplate) $this->tamplate = ADMIN_TEMPLATE . 'show';
+
+        $this->content = $this->render($this->tamplate, $vars);
+
+        return parent::outputData();
         
     }
 
