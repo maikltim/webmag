@@ -16,6 +16,7 @@ abstract class BaseAdmin extends BaseController
     protected $table;
     protected $columns;
     protected $data;
+    protected $foreignData;
 
     protected $adminPath;
 
@@ -176,6 +177,22 @@ abstract class BaseAdmin extends BaseController
 
         return;
 
+    }
+
+
+    protected function createRadio($settings = false) {
+        if(!$settings) $setting = Settings::instance();
+
+        $radio = $settings::get('radio');
+
+        if($radio) {
+            foreach($this->columns as $name => $item) {
+                if($radio[$name]){
+                    $this->foreignData[$name] = $radio[$name];
+                }
+            }
+        }
+    
     }
 
 }

@@ -55,8 +55,18 @@ class Settings
         'textarea' => ['content', 'keywords']
     ];
 
-    private $transleta = [
-        'name' => []
+    private $translate = [
+        'name' => [],
+        'content' => [],
+    ];
+
+    private $radio = [
+        'visible' => ['нет', 'да', 'default' => 'да']
+    ];
+
+    private $rootItems = [
+        'name' => ['Корневая'],
+        'tables' => ['articles']
     ];
 
     private $blockNeedle = [
