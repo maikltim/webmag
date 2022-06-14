@@ -17,10 +17,22 @@ class AddController extends BaseAdmin
 
         $this->createForeignData();
 
+        $this->createMenuPosition();
+
         $this->createOutputData();
 
         $this->createRadio();
 
+        $this->manyAdd();
+
+    }
+
+
+    protected function manyAdd() {
+
+
+        $fields = ['name', 'Masha'];
+        $files = ['img', '1.jpg'];
     }
 
     protected function createForeignProperty ($arr, $rootItems) {
@@ -91,11 +103,77 @@ class AddController extends BaseAdmin
             $arr['REFERENCED_NAME'] = 'parent_id';
             $arr['REFERENCED_COLUMN_NAME'] = $this->columns['id_row'];
             $arr['REFERENCED_TABLE_NAME'] = $this->table;
-            $this->createForeignProperty($arr, $rootItem);
+            $this->createForeignProperty($arr, $rootItems);
 
         }
         return;
  
+    }
+
+
+    protected function createMenuPosition ($settings = false) {
+
+        if($this->columns['menu_position']) {
+            if(!$settings) $settings = Settings::instance();
+            $rootItems = $settings::get('rootItems');
+
+            if($this->columns['parent_id']) {
+
+
+                if(in_array($this->table, $rootItems['tables'])) {
+                    $where = 'parent_id IS NULL OR parent_id = 0';
+                } else {
+
+                    $parent = $this->model->showForeignKeys($this->table, 'parent_id')[0];
+
+                    if($parent) {
+
+                        if($this->table === $parent['REFERENCED_TABLE_NAME']) {
+                            $where = 'parent_id IS NULL OR parent_id = 0';
+                        } else {
+                            
+                            $columns = $this->model->showColumns($parent['REFERENCED_TABLE_NAME']);
+
+                            if($columns['parent_id']) $oreder[] = 'parent_id';
+                                else $order[] = $parent['REFERENCED_COLUMN_NAME'];
+    
+                            $id = $this->model->get($parent['REFERENCED_TABLE_NAME'], [
+                                'fields' => [$parent['REFERENCED_COLUMN_NAME']],
+                                'oreder' => $order,
+                                'limit' => '1'
+                            ])[0][$parent['REFERENCED_COLUMN_NAME']];
+                            if($id) $where = ['parent_id' => $id];
+
+                        }
+
+                        
+
+                    } else {
+                        $where = 'parent_id IS NULL OR parent_id = 0';
+                        
+                    }
+
+
+                }
+            }
+
+            $menu_pos = $this->model->get($this->table, [
+                'fields' => ['COUNT(*) as count'],
+                $where => $where,
+                'no concat' => true
+            ])[0]['count'] + 1;
+
+            for($i = 1; $i <= $menu_pos; $i++) {
+
+                $this->foreignData['menu_position'][$i - 1]['id'] = $i;
+                $this->foreignData['menu_position'][$i - 1]['name'] = $i;
+
+            }
+
+        }
+        
+        return;
+
     }
 
 }
