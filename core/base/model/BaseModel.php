@@ -97,13 +97,9 @@ abstract class BaseModel extends BaseModelMethod
         $set['except'] = (is_array($set['except']) && !empty($set['except'])) ? $set['except'] : false;
 
         $insert_arr = $this->createInsert($set['fields'], $set['files'], $set['except']);
-
-        if($insert_arr) {
-            $query = "INSERT INTO $table ({$insert_arr['fields']}) VALUES ({$insert_arr['values']})";
-            return $this->query($query, 'c', $set['return_id']);
-        }
-
-        return false;
+        $query = "INSERT INTO $table {$insert_arr['fields']} VALUES {$insert_arr['values']}";
+        return $this->query($query, 'c', $set['return_id']);
+       
 
     }
 
@@ -141,7 +137,7 @@ abstract class BaseModel extends BaseModelMethod
     public function delete($table, $set) {
 
         $table = trim($table);
-        $where = $this->cereateWhere($set, $table);
+        $where = $this->createWhere($set, $table);
 
         $columns = $this->showColumns($table);
         if(!$columns) return false;

@@ -31,8 +31,16 @@ class AddController extends BaseAdmin
     protected function manyAdd() {
 
 
-        $fields = ['name', 'Masha'];
-        $files = ['img', '1.jpg'];
+        $fields = [
+            0 => ['name', 'Masha', 'img', '1.jpg'],
+            1 => ['name', 'Masha']
+        ];
+        $files = ['img', '1.jpg', 'img', '2.jpg'];
+
+        $this->model->add('teachers', [
+            'fields' => $fields,
+            'files' => $files
+        ]);
     }
 
     protected function createForeignProperty ($arr, $rootItems) {
