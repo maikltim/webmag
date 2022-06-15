@@ -286,7 +286,10 @@ abstract class BaseModelMethod
 
         if($files) {
 
+            
+
             foreach($files as $row => $file) {
+                $insert_arr['fields'] .= $row . ',';
                 if(is_array($file)) $insert_arr['values'] .= "'" . addslashes(json_encode($file)) . "',";
                     else $insert_arr['values'] .= "'" . addslashes($file) . "',";
             }
