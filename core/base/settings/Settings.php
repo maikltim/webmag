@@ -43,6 +43,8 @@ class Settings
 
     private $expansion = 'core/admin/expansion/';
 
+    private $formTemplates = PATH . 'core/admin/view/include/form_templates/';
+
 
     private $projectTables = [
         'teachers' => ['name' => 'Teachers', 'img' => 'pages.png'],
