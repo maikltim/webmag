@@ -30,6 +30,8 @@ abstract class BaseAdmin extends BaseController
     protected $templateArr;
     protected $formTemplates;
 
+    protected $noDelete;
+
 
     protected function inputData() {
 
@@ -42,6 +44,7 @@ abstract class BaseAdmin extends BaseController
 
 
         if(!$this->templateArr) $this->templateArr = Settings::get('templateArr');
+        if(!$this->formTemplates) $this->formTemplates = Settings::get('formTemplates');
 
         $this->sendNoCasheHeaders();
 
