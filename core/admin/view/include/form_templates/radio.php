@@ -1,23 +1,24 @@
-<div class="option_wrap">
-    <label class="custom_label" for="29-31">
-        <div>
-            <input id="29-31" type="checkbox" name="filters[29][31][id]" value="31">
-            <span class="custom_check backgr_bef"></span>
-            <span class="label">2px</span>
+<div class="vg-element vg-full vg-box-shadow">
+    <div class="vg-wrap vg-element vg-full vg-box-shadow">
+        <div class="vg-wrap vg-element vg-half vg-left vg-no-space-top">
+            <div class="vg-element vg-full vg-left">
+                <span class="vg-header"><?=$this->translate[$row][0] ?: $row?></span>
+            </div>
+            <div class="vg-element vg-full vg-left">
+                <span class="vg-text vg-firm-color5"></span><span class="vg_subheader"><?=$this->translate[$row][1]?></span>
+            </div>
+            <div class="vg-wrap vg-element vg-fourth">
+                <?php foreach($this->foreignData[$row] as $key => $item):?>
+                    <?php if(is_int($key)):?>
+                <label class="vg-element vg-full vg-center vg-left vg-space-between">
+                    <span class="vg-text vg-half"><?=$item?></span>
+                    <input type="radio" name="<?= $row?>" class="vg-input vg-half" 
+                        <?php if(isset($this->data[$row]) && $this->data[$row] == $key) echo 'checkend' ;
+                        elseif(!isset($this->data[$row]) && $this->foreignData['default'] == $item) echo 'checked' ?>value="<?=$key?>">
+                </label>
+                <?php endif;?>
+                <?php endforeach ;?>
+            </div>
         </div>
-    </label>
-    <label class="custom_label" for="29-30">
-        <div>
-            <input id="29-30" type="checkbox" name="filters[29][30][id]" value="30">
-            <span class="custom_check backgr_bef"></span>
-            <span class="label">1 px</span>
-        </div>
-    </label>
-    <label class="custom_label" for="29-32">
-        <div>
-            <input id="29-32" type="checkbox" name="filters[29][32][id]" value="32">
-            <span class="custom_check backgr_bef"></span>
-            <span class="label">3px</span>
-        </div>
-    </label>
+    </div>
 </div>
