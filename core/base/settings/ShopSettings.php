@@ -9,7 +9,9 @@ use core\base\settings\Settings;
 class ShopSettings 
 {
 
-   use Singleton;
+   use Singleton {
+    instance as traitInstance;
+   }
 
     private $baseSettings;
 
@@ -32,11 +34,11 @@ class ShopSettings
     static public function get($property)
     {
 
-        return self::getInstance()->$property;
+        return self::instance()->$property;
 
     }
 
-    static private function getInstance()
+    static private function instance()
     {
 
         if(self::$_instance instanceof self) {
