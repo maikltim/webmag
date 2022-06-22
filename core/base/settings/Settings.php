@@ -43,6 +43,8 @@ class Settings
 
     private $expansion = 'core/admin/expansion/';
 
+    private $messages = 'core/base/messages/';
+
     private $formTemplates = PATH . 'core/admin/view/include/form_templates/';
 
 
