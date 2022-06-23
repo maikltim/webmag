@@ -451,7 +451,7 @@ abstract class BaseAdmin extends BaseController
             }
 
             if($_POST['alias'] && $id) {
-                method_exists($this, 'checkAlias') && $this->checkOldAlias($id);
+                method_exists($this, 'checkAlias') && $this->checkAlias($id);
             }
 
         }
@@ -459,6 +459,20 @@ abstract class BaseAdmin extends BaseController
     }
 
     protected function checkAlias($id) {
+
+        if($id) {
+            if($this->alias) {
+                $this->alias .= '-' . $id;
+
+                $this->model->edit($this->table, [
+                    'fields' => ['alias' => $this->alias],
+                    'where' => [$this->columns['id_row'] => 'id']
+                ]);
+                return true;
+            }
+        }
+
+        return false;
 
     }
 
