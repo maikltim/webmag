@@ -88,7 +88,7 @@ class CreatesitemapController
         if($links[2]) {
             foreach($links[2] as $link) {
 
-                if($link === '/' || $link === SITE_URL . '/') return;
+                if($link === '/' || $link === SITE_URL . '/') continue;
 
                 foreach($this->fileArray as $ext) {
 
@@ -109,7 +109,13 @@ class CreatesitemapController
                     $link = SITE_URL . $link;
                 }
 
-                if(!in_array($link, $this->linkArr) && $link !== '#' && strpos($link, SITE_URL) === 0) 
+                if(!in_array($link, $this->linkArr) && $link !== '#' && strpos($link, SITE_URL) === 0);
+                    if($this->filter($link)) {
+
+                        $this->linkArr[] = $link;
+                        $this->parsing($link, count($this->linkArr) - 1);
+
+                    }
 
             }
         }
@@ -118,6 +124,40 @@ class CreatesitemapController
 
 
     protected function filter($link) {
+
+        if($this->fileArr) {
+
+            foreach($this->filterArr as $type => $values) {
+
+                    if($values) {
+
+                        foreach($values as $item) {
+
+                            $item = str_replace('/', '\/', addslashes($item, '/'));
+
+                            if($type === 'url') {
+
+                                if(preg_match('/' . $item . '/ui', $link)) return false;
+                            } 
+
+
+                            if($type == 'get') {
+                                
+                                if(preg_match('/(\?|&amp;|=|&) ' . $item . '(=|&amp;|&|$)/ui', $link)) {
+                                    return false;
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+            }
+
+        }
+
+        return true;
 
     }
 
