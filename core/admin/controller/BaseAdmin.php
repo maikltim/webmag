@@ -7,6 +7,7 @@ use core\admin\model\Model;
 use core\base\controller\BaseController;
 use core\base\exceptions\RouteException;
 use core\base\settings\Settings;
+use core\admin\controller\FileEdit;
 
 abstract class BaseAdmin extends BaseController
 {
@@ -397,6 +398,10 @@ abstract class BaseAdmin extends BaseController
 
     protected function createFile() {
 
+        $fileEdit = new FileEdit();
+        $this->fileArray = $fileEdit->addFile();
+
+
     }
 
     protected function updateMenuPosition() {
@@ -425,6 +430,7 @@ abstract class BaseAdmin extends BaseController
                 $alias_str = $_POST['alias'] = $this->clearStr($_POST['alias']);
             }
 
+            $alias_str = '_-asdkljф//\_ы1232342\в/дл   одф--л-ыв_!"__№;%::?* --__';
             $textModify = new \libraries\TextModify();
             $alias = $textModify->translit($alias_str);
 

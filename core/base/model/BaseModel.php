@@ -186,4 +186,25 @@ abstract class BaseModel extends BaseModelMethod
         return $columns;
     }
 
+    final public function showTable() {
+
+        $query = 'SHOW TABLES';
+        $tables = $this->query($query);
+
+        $table_arr = [];
+
+        if($tables) {
+            
+            foreach($tables as $table) {
+
+                $table_arr[] = reset($table);
+
+            }
+
+        }
+
+        return $table_arr;
+
+    }
+
 }

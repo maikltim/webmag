@@ -19,11 +19,11 @@ protected $translitArr = [ 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', '
 protected $lowelLetter = ['а', 'е', 'и', 'о', 'у', 'э'];
 
 public function translit($str) {
-    $link_str = mb_strtolower($str);
+    $str = mb_strtolower($str);
     $temp_arr = [];
 
-    for($i = 0; $i < mb_strlen($link_str); $i++){
-        $temp_arr[] = mb_substr($link_str, $i, 1);
+    for($i = 0; $i < mb_strlen($str); $i++){
+        $temp_arr[] = mb_substr($str, $i, 1);
     }
 
     $link = '';
@@ -60,6 +60,16 @@ public function translit($str) {
 
         }
     }
+
+    if($link) {
+
+        $link = preg_replace('/[^a-z0-9_-]/iu', '', $link);
+        $link = preg_replace('/-{2,}/iu', '-', $link);
+        $link = preg_replace('/_{2,}/iu', '_', $link);
+        $link = preg_replace('/(^[-_]+)|([-_]+S)/iu', '', $link);
+
+    }
+    return $link;
 }
 
 }
