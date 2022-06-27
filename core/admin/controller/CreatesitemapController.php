@@ -1,15 +1,19 @@
 <?php
 
 use core\base\controller\BaseMethods;
+use  core\admin\controller\BaseAdmin;
 
-class CreatesitemapController
+class CreatesitemapController extends BaseAdmin
 {
 
     use BaseMethods;
 
-    protected $liinkArr = [];
+    protected $all_links = [];
+    protected $temp_links = [];
+    protected $maxLinks = 5000;
     protected $parcingLogFile = 'parsing_log.txt';
     protected $fileArr = ['jpg', 'png', 'jpeg', 'gif', 'xls', 'xlsx', 'pdf', 'mp4', 'mpeg', 'mp3'];
+    protected $tables;
 
     protected $filterArr = [
         'url' => [],
@@ -18,18 +22,50 @@ class CreatesitemapController
 
 
 
-    protected function inputData() {
+    protected function inputData($links_counter = 1) {
 
         if(!function_exists('curl_init')) {
+
+            $this->cancel(0, 'Library CURL', '', true);
+
+
             $this->writeLog('no file CURL');
             $_SESSION['res']['answer'] = '<div class="error">Library CURL</div>';
             $this->redirect();
         }
 
+        if($this->userId) $this->execBase();
+        if(!$this->checkParsingTable()) {
+
+                $this->cancel(0, 'yoyu have problem with data', '', true);
+
+        }
+
         set_time_limit(0);
 
-        if(file_exists($_SERVER['DOCUMENT_ROOT'] . PATH . 'log/' . $this->parsingLogFile));
-            @unlink($_SERVER['DOCUMENT_ROOT'] . PATH . 'log/' . $this->parsingLogFile);
+        $reserve = $this->model->get('parsing_data')[0];
+
+        foreach($reserve as $name => $item){
+            if($item) $this->name = json_decode($item);
+            else $this->$name = [SITE_URL];
+        }
+
+        $this->maxLinks = (int)$links_counter > 1 ? ceil($this->maxLinks / $links_counter) : $this->maxLinks;
+
+        while($this->temp_links) {
+            $temp_links_count = count($this->temp_links);
+
+            $links = $this->temp_links;
+            $this->temp_links = [];
+
+            if($temp_links_count > $this->maxLinks) {
+
+            } else {
+                
+            }
+
+
+        }
 
         $this->parsing(SITE_URL);
 
@@ -62,9 +98,9 @@ class CreatesitemapController
         curl_close($curl);
 
         if(!preg_match("/Content-Type:\s+text\/html/uis", $out)) {
-            unset($this->linkArr[$index]);
+            unset($this->$all_links[$index]);
 
-            $this->linkArr = array_values($this->linkArr); 
+            $this->all_links = array_values($this->linkArr); 
 
             return;
 
@@ -72,9 +108,9 @@ class CreatesitemapController
 
         if(!preg_match('/HTTP\/\d\.?\d?\s+20\d/ui', $out)) {
             $this->writeLog('No correct link - ' . $url, $this->parsingLogFile);
-            unset($this->linkArr[$index]);
+            unset($this->all_links[$index]);
 
-            $this->linkArr = array_values($this->linkArr); 
+            $this->all_links = array_values($this->all_links); 
 
             $_SESSION['res']['answer'] = '<div class="succes">' . $url . '</div>';
 
@@ -86,6 +122,12 @@ class CreatesitemapController
         preg_match_all('/<a\s*?[^>]*?href\s*?=(["\'])(.+?)\1[^>]*?>/ui', $str, $links);
 
         if($links[2]) {
+
+            $links[2] = [];
+
+            $links[2][0] = 'http://yandex.ru/image.jpg';
+
+
             foreach($links[2] as $link) {
 
                 if($link === '/' || $link === SITE_URL . '/') continue;
@@ -96,7 +138,7 @@ class CreatesitemapController
                         $ext = addslashes($ext);
                         $ext = str_replace('.', '\.', $ext); 
 
-                        if(preg_match('/' . $ext . '\s*?$/ui', $link)) {
+                        if(preg_match('/' . $ext . '\s*?$|\?[^\/]/ui', $link)) {
 
                             continue 2;
 
@@ -109,11 +151,11 @@ class CreatesitemapController
                     $link = SITE_URL . $link;
                 }
 
-                if(!in_array($link, $this->linkArr) && $link !== '#' && strpos($link, SITE_URL) === 0);
+                if(!in_array($link, $this->all_links) && $link !== '#' && strpos($link, SITE_URL) === 0);
                     if($this->filter($link)) {
 
-                        $this->linkArr[] = $link;
-                        $this->parsing($link, count($this->linkArr) - 1);
+                        $this->all_links[] = $link;
+                        $this->parsing($link, count($this->all_links) - 1);
 
                     }
 
@@ -137,7 +179,7 @@ class CreatesitemapController
 
                             if($type === 'url') {
 
-                                if(preg_match('/' . $item . '/ui', $link)) return false;
+                                if(preg_match('/^[^\?]*' . $item . '*[\?|$]/ui', $link)) return false;
                             } 
 
 
@@ -158,6 +200,44 @@ class CreatesitemapController
         }
 
         return true;
+
+    }
+
+    protected function checkParsingTable() {
+
+        $this->model->showTables();
+
+        if(!in_array('parsing_data', $tables)) {
+            $query = 'CREATE TABLE parsing_data (all_links ttext, temp_links text)';
+
+            if(!$this->model->query($query, 'c') ||
+            !$this->model->add('parsing_data', ['fields' => ['all_links' => '', 'temp_links' => '']])
+            ){return false;}
+        }
+
+    }
+
+    protected function cancel($success = 0, $message = '', $log_message = '', $exit = false) {
+
+        $exitArr = [];
+
+        $exitArr['success'] = $success;
+        $exitArr['message'] = $message ? $message : 'ERROR PARSING';
+        $log_message = $log_message ? $log_message : $exitArr['message'];
+
+        $class = 'success';
+
+        if(!$exitArr['success']) {
+
+            $class = 'error';
+
+            $this->writeLog($log_message, 'parsing_log');
+        }
+
+        if($exit) {
+            $exitArr['message'] = '<div class="' .$class.'">' . $exitArr['message'] . '</div>';
+            exit(json_encode($exitArr));
+        }
 
     }
 
